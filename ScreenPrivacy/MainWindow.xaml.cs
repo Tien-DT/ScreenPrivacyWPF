@@ -25,7 +25,8 @@ namespace ScreenPrivacy
         private Thread _cameraThread;
         private bool _isFaceDetectionRunning;
         private TaskbarIcon _notifyIcon;
-
+        private CascadeClassifier _faceCascade;
+        private bool _isPreviewing;
         [DllImport("user32.dll")]
         private static extern void LockWorkStation();
         public MainWindow()
@@ -38,6 +39,7 @@ namespace ScreenPrivacy
                 Visibility = Visibility.Visible
             };
             _notifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
+            _faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
         }
 
         private void StartServiceButton_Click(object sender, RoutedEventArgs e)
@@ -121,5 +123,20 @@ namespace ScreenPrivacy
                 base.OnClosing(e);
             }
         }
+
+        private void PreviewButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isPreviewing)
+            {
+                _isPreviewing = false;
+                _capture.Release(); 
+            }
+            else
+            {
+                _isPreviewing = true;
+                var previewWindow = new PreviewWindow();
+                previewWindow.Show();
+            }
+        }  
     }
 }
