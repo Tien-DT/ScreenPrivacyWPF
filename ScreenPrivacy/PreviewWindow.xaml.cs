@@ -83,7 +83,7 @@ namespace ScreenPrivacy
 
         private void Window_Closed(object sender, EventArgs e)
         {
-
+            MainWindow._isPreviewing = false;
         }
     }
 }

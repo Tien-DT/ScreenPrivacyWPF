@@ -26,7 +26,7 @@ namespace ScreenPrivacy
         private bool _isFaceDetectionRunning;
         private TaskbarIcon _notifyIcon;
         private CascadeClassifier _faceCascade;
-        private bool _isPreviewing;
+        public static bool _isPreviewing { get; set; } = false;
         [DllImport("user32.dll")]
         private static extern void LockWorkStation();
         public MainWindow()
@@ -105,9 +105,35 @@ namespace ScreenPrivacy
                     }
                 }
 
-                Thread.Sleep(100);
+                Thread.Sleep(5000);
             }
         }
+
+        //private void FaceDetectionWithTime()
+        //{
+        //    using var faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
+        //    DateTime lastFaceDetectedTime = DateTime.Now; 
+        //    while (_isFaceDetectionRunning)
+        //    {
+        //        using var frame = new Mat();
+        //        _capture.Read(frame);
+        //        if (frame.Empty()) continue;
+        //        var gray = frame.CvtColor(ColorConversionCodes.BGR2GRAY);
+        //        var faces = faceCascade.DetectMultiScale(gray, 1.1, 4, HaarDetectionTypes.ScaleImage);
+        //        if (faces.Length > 0)
+        //        {
+        //            lastFaceDetectedTime = DateTime.Now;
+        //        }
+        //        else
+        //        {
+        //            if ((DateTime.Now - lastFaceDetectedTime).TotalSeconds >= 5)
+        //            {
+        //                LockWorkStation();
+        //            }
+        //        }
+        //        Thread.Sleep(100);
+        //    }
+        //}
 
         protected override void OnClosing(CancelEventArgs e)
         {
