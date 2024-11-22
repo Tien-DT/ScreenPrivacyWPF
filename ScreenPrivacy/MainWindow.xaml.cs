@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace ScreenPrivacy
 {
@@ -39,7 +40,10 @@ namespace ScreenPrivacy
                 Visibility = Visibility.Visible
             };
             _notifyIcon.TrayMouseDoubleClick += NotifyIcon_TrayMouseDoubleClick;
-            _faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string faceCascadePath = System.IO.Path.Combine(appDirectory, "haarcascade_frontalface_default.xml");
+            _faceCascade = new CascadeClassifier(faceCascadePath);
+
         }
 
         private void StartServiceButton_Click(object sender, RoutedEventArgs e)
@@ -85,55 +89,28 @@ namespace ScreenPrivacy
 
         private void FaceDetection()
         {
-            using var faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
-
+            DateTime lastFaceDetectedTime = DateTime.Now;
             while (_isFaceDetectionRunning)
             {
                 using var frame = new Mat();
                 _capture.Read(frame);
                 if (frame.Empty()) continue;
-
                 var gray = frame.CvtColor(ColorConversionCodes.BGR2GRAY);
-                var faces = faceCascade.DetectMultiScale(gray, 1.1, 4, HaarDetectionTypes.ScaleImage);
-
-                if (faces.Length == 0)
+                var faces = _faceCascade.DetectMultiScale(gray, 1.1, 4, HaarDetectionTypes.ScaleImage);
+                if (faces.Length > 0)
                 {
-                    Thread.Sleep(5000);
-                    if (_isFaceDetectionRunning && faces.Length == 0)
+                    lastFaceDetectedTime = DateTime.Now;
+                }
+                else
+                {
+                    if ((DateTime.Now - lastFaceDetectedTime).TotalSeconds >= 10)
                     {
                         LockWorkStation();
                     }
                 }
-
-                Thread.Sleep(5000);
+                Thread.Sleep(100);
             }
         }
-
-        //private void FaceDetectionWithTime()
-        //{
-        //    using var faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
-        //    DateTime lastFaceDetectedTime = DateTime.Now; 
-        //    while (_isFaceDetectionRunning)
-        //    {
-        //        using var frame = new Mat();
-        //        _capture.Read(frame);
-        //        if (frame.Empty()) continue;
-        //        var gray = frame.CvtColor(ColorConversionCodes.BGR2GRAY);
-        //        var faces = faceCascade.DetectMultiScale(gray, 1.1, 4, HaarDetectionTypes.ScaleImage);
-        //        if (faces.Length > 0)
-        //        {
-        //            lastFaceDetectedTime = DateTime.Now;
-        //        }
-        //        else
-        //        {
-        //            if ((DateTime.Now - lastFaceDetectedTime).TotalSeconds >= 5)
-        //            {
-        //                LockWorkStation();
-        //            }
-        //        }
-        //        Thread.Sleep(100);
-        //    }
-        //}
 
         protected override void OnClosing(CancelEventArgs e)
         {

@@ -37,7 +37,9 @@ namespace ScreenPrivacy
                 Close();
                 return;
             }
-            _faceCascade = new CascadeClassifier(@"C:\Users\USER\Documents\TaiLieu\Personal Project\ScreenPrivacy\ScreenPrivacy\haarcascade_frontalface_default.xml");
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string faceCascadePath = System.IO.Path.Combine(appDirectory, "haarcascade_frontalface_default.xml");
+            _faceCascade = new CascadeClassifier(faceCascadePath);
             StartWebcamPreview();
         }
         private void StartWebcamPreview()
