@@ -30,6 +30,8 @@ namespace ScreenPrivacy
         public static bool _isPreviewing { get; set; } = false;
         [DllImport("user32.dll")]
         private static extern void LockWorkStation();
+
+        public static int timeOut { get; set; } = 3;
         public MainWindow()
         {
             InitializeComponent();
@@ -103,7 +105,7 @@ namespace ScreenPrivacy
                 }
                 else
                 {
-                    if ((DateTime.Now - lastFaceDetectedTime).TotalSeconds >= 10)
+                    if ((DateTime.Now - lastFaceDetectedTime).TotalSeconds >= timeOut)
                     {
                         LockWorkStation();
                     }
@@ -140,6 +142,12 @@ namespace ScreenPrivacy
                 var previewWindow = new PreviewWindow();
                 previewWindow.Show();
             }
-        }  
+        }
+
+        private void SetTimeOut_Click(object sender, RoutedEventArgs e)
+        {
+            var setTimeOutWindow = new SetTimeOutWindow();
+            setTimeOutWindow.Show();
+        }
     }
 }
